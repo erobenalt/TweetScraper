@@ -22,17 +22,16 @@ public class MySqlDBHandler {
 	private static String table = "tweetTable";
 	
 	//Store sensitive information in our system environment variables
-	private static String dbLocation = System.getenv("TS_DB_LOCATION");//jdbc:mysql://database-1.cwhlnob7yfmg.us-west-1.rds.amazonaws.com:3306/sql_testdb
+	private static String dbLocation = System.getenv("TS_DB_LOCATION");//jdbc:mysql://127.0.0.1:3306/tweet_db
 	private static String dbUser = System.getenv("TS_DB_USER");
 	private static String dbPass = System.getenv("TS_DB_PASS");
 	
 	//Attempts to connect to the DB and prints error if it fails
 	public static void connectDb() {
-		
 		try{
 			//Attempts to connect using our db location, user, and password set in our system environment variables 
 			con=DriverManager.getConnection(  
-					dbLocation,dbUser,dbPass);  
+					System.getenv("TS_DB_LOCATION"),System.getenv("TS_DB_USER"),System.getenv("TS_DB_PASS"));  
 			dbConnected = true;
 		}catch(Exception e){
 			System.out.println("Error detected");
@@ -166,28 +165,28 @@ public class MySqlDBHandler {
 		int quoteCount = tw.getMetrics().getQuoteCount();
 		
 		//anaylyze the sentiment using
-		Entity e = SentimentAnalyzer.analyzeEntitySetRule(tw.getData().getText(),tag,0.1);
+		//Entity e = SentimentAnalyzer.analyzeEntitySetRule(tw.getData().getText(),tag,0.1);
 		
 		//salience is used to determine the relevance of the tweet. No Salience implies no relevance and we ignore the tweet
-		if (e == null) {
+		/*if (e == null) {
 			System.out.println("Salience was not high enough");
 			return;
-		}
+		}*/
 		
 		//Set our sentiment fields in our tweet object for later use, and put them into a variable
-		Sentiment s = e.getSentiment();
-		tw.getSentiment().setMagnitude(s.getMagnitude());
-		tw.getSentiment().setScore(s.getScore());
-		tw.getSentiment().setSalience(e.getSalience());
+		//Sentiment s = e.getSentiment();
+		//tw.getSentiment().setMagnitude(s.getMagnitude());
+		//tw.getSentiment().setScore(s.getScore());
+		//tw.getSentiment().setSalience(e.getSalience());
 		
-		float salience = tw.getSentiment().getSalience();
-		float magnitude = tw.getSentiment().getMagnitude();
-		float score = tw.getSentiment().getScore();
+		float salience = 0.00f;//tw.getSentiment().getSalience();
+		float magnitude = 0.00f;//tw.getSentiment().getMagnitude();
+		float score = 0.00f;//tw.getSentiment().getScore();
 		
 
 
 		//Now that we have all of our variables, we can finally craft our SQL insert
-		String finalInsert = "INSERT INTO "+table+"(tweettext,id,authorId,createdAt,dateInMilli,username,twittername,matchingrule,retweetcount,replycount,likecount,quotecount,magnitude,score,salience) VALUES ('"
+		String finalInsert = "INSERT INTO "+table+"(tweettext,id,authorId,createdAt,dateinmilli,username,twittername,matchingrule,retweetcount,replycount,likecount,quotecount,magnitude,score,salience) VALUES ('"
 				+text+"','"
 				+id+"','"
 				+authorId+"','"
